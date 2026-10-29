@@ -1,0 +1,27 @@
+{
+  "name": "ai",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "test:movement": "node src/utils/gridMovementVerification.js",
+    "test:bfs": "node src/utils/bfsVerification.js",
+    "test:algorithms": "node src/utils/algorithmsVerification.js",
+    "test:simulation": "node src/utils/simulationHistoryVerification.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "oxlint": "^1.88.0",
+    "vite": "^8.3.4"
+  }
+}
