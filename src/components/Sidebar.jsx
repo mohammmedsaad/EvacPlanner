@@ -1,4 +1,4 @@
-function Sidebar({ activePage, setActivePage, isMobileOpen, setIsMobileOpen }) {
+function Sidebar({ activePage, setActivePage, isMobileOpen, setIsMobileOpen, currentUser, onLogout }) {
   const navItems = [
     {
       id: 'dashboard',
@@ -110,13 +110,33 @@ function Sidebar({ activePage, setActivePage, isMobileOpen, setIsMobileOpen }) {
           ))}
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="academic-badge">
-            <span className="badge-dot"></span>
-            <span>AI Capstone • Final Stage</span>
+        {currentUser && (
+          <div className="sidebar-footer sidebar-user-footer">
+            <div className="sidebar-user-avatar" aria-hidden="true">
+              {currentUser.name ? currentUser.name[0].toUpperCase() : 'O'}
+            </div>
+            <div className="sidebar-user-meta">
+              <span className="sidebar-user-name" title={currentUser.name}>{currentUser.name}</span>
+              <span className="sidebar-user-role" title={currentUser.role}>{currentUser.role}</span>
+            </div>
+            {onLogout && (
+              <button
+                type="button"
+                className="sidebar-logout-btn"
+                onClick={onLogout}
+                title="Sign out of operator session"
+                aria-label="Sign out"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+              </button>
+            )}
           </div>
-          <div className="academic-desc">EvacPlanner • Multi-Algorithm Benchmark</div>
-        </div>
+        )}
       </aside>
     </>
   )

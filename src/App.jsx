@@ -6,6 +6,7 @@ import DashboardView from './components/DashboardView'
 import BuildingMapView from './components/BuildingMapView'
 import EvacuationSimulationView from './components/EvacuationSimulationView'
 import SimulationHistoryView from './components/SimulationHistoryView'
+import LoginView from './components/LoginView'
 import AboutView from './components/AboutView'
 import PlaceholderView from './components/PlaceholderView'
 import { PRESETS, DEFAULT_GRID } from './constants/gridConstants'
@@ -13,6 +14,23 @@ import { cloneGrid, validateGrid } from './utils/gridUtils'
 import { runAlgorithm } from './algorithms/index'
 
 const STORAGE_KEY = 'evacplanner_simulation_history_v1'
+const USER_STORAGE_KEY = 'evacplanner_auth_user_v1'
+
+function loadStoredUser() {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const local = localStorage.getItem(USER_STORAGE_KEY)
+      if (local) return JSON.parse(local)
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      const session = sessionStorage.getItem(USER_STORAGE_KEY)
+      if (session) return JSON.parse(session)
+    }
+  } catch (err) {
+    console.warn('Failed to load user session:', err)
+  }
+  return null
+}
 
 function loadStoredHistory() {
   try {
@@ -42,6 +60,7 @@ function saveStoredHistory(runs) {
 }
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(() => loadStoredUser())
   const [activePage, setActivePage] = useState('dashboard')
   const [selectedBuilding, setSelectedBuilding] = useState('bldg-1')
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('BFS')
@@ -129,7 +148,50 @@ function App() {
     }
   }
 
+  const handleLogin = (user, rememberMe) => {
+    setCurrentUser(user)
+    try {
+      if (rememberMe) {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+      } else {
+        sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+      }
+    } catch (err) {
+      console.warn('Failed to save user session:', err)
+    }
+  }
+
+  const handleLogout = () => {
+    setCurrentUser(null)
+    try {
+      localStorage.removeItem(USER_STORAGE_KEY)
+      sessionStorage.removeItem(USER_STORAGE_KEY)
+    } catch (err) {
+      console.warn('Failed to clear user session:', err)
+    }
+  }
+
+  const handleGuestContinue = () => {
+    const guestUser = {
+      name: 'Guest Operator',
+      email: 'guest@evacplanner.ai',
+      role: 'Guest Observer',
+      loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+    handleLogin(guestUser, false)
+  }
+
   const gridValidation = validateGrid(grid)
+
+  // Render dedicated Login page when not authenticated
+  if (!currentUser) {
+    return (
+      <LoginView
+        onLogin={handleLogin}
+        onGuestContinue={handleGuestContinue}
+      />
+    )
+  }
 
   return (
     <div className="app-shell">
@@ -139,6 +201,8 @@ function App() {
         setActivePage={setActivePage}
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* 2. Main Content Area */}
@@ -148,6 +212,8 @@ function App() {
           selectedBuilding={selectedBuilding}
           setSelectedBuilding={handleSelectBuilding}
           setIsMobileOpen={setIsMobileOpen}
+          currentUser={currentUser}
+          onLogout={handleLogout}
         />
 
         <main className="app-content-body">

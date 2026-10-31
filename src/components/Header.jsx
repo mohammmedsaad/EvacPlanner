@@ -73,9 +73,9 @@ function Header({ activePage, selectedBuilding, setSelectedBuilding, setIsMobile
           </div>
         </div>
 
-        <div className="status-badge" title="Stage 2 visual interface baseline">
+        <div className="status-badge" title="Evacuation System Online">
           <span className="status-dot"></span>
-          <span className="status-text">Demo Mode • UI Phase</span>
+          <span className="status-text">System Active</span>
         </div>
       </div>
     </header>
